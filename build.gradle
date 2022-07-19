@@ -8,9 +8,7 @@
 plugins {
     id 'application'
     id 'checkstyle'
-    id ('net.ltgt.errorprone') version '2.0.2'
     id 'jacoco'
-    id 'com.adarshr.test-logger' version '3.1.0'
 }
 
 group = 'hexlet.code'
@@ -18,11 +16,11 @@ version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    google()
 }
 
 ext {
     jUnitJupiterVersion = '5.8.2'
-    errorProneVersion = '2.14.0'
 }
 
 compileJava {
@@ -35,8 +33,6 @@ application {
 
 dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter:${jUnitJupiterVersion}"
-
-    errorprone "com.google.errorprone:error_prone_core:${errorProneVersion}"
 }
 
 test {
@@ -52,9 +48,4 @@ jacocoTestReport {
     reports {
         xml.required = true
     }
-}
-
-testlogger {
-    showStandardStreams true
-    theme 'standard'
 }
