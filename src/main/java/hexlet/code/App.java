@@ -6,12 +6,12 @@ import io.javalin.core.JavalinConfig;
 public class App {
 
     public static void main(String[] args) {
-       Javalin javalin = getApp();
-       javalin.start(getPort());
+        Javalin javalin = getApp();
+        javalin.start(getPort());
     }
 
     public static Javalin getApp() {
-        Javalin javalin= Javalin.create(JavalinConfig::enableDevLogging);
+        Javalin javalin = Javalin.create(JavalinConfig::enableDevLogging);
         addRoutes(javalin);
         return javalin;
     }
