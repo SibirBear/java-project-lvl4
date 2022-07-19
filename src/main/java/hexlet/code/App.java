@@ -1,14 +1,28 @@
 package hexlet.code;
 
+import io.javalin.Javalin;
+import io.javalin.core.JavalinConfig;
+
 public class App {
 
     public static void main(String[] args) {
-        printResult("Hello!");
+       Javalin javalin = getApp();
+       javalin.start(getPort());
     }
 
-    public static boolean printResult(String result) {
-        System.out.println(result);
-        return true;
+    public static Javalin getApp() {
+        Javalin javalin= Javalin.create(JavalinConfig::enableDevLogging);
+        addRoutes(javalin);
+        return javalin;
+    }
+
+    private static int getPort() {
+        String port = System.getenv().getOrDefault("PORT", "8091");
+        return Integer.parseInt(port);
+    }
+
+    private static void addRoutes(Javalin javalin) {
+        javalin.get("/", ctx -> ctx.result("Hello, world!"));
     }
 
 }
