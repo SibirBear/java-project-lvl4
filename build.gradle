@@ -22,10 +22,6 @@ ext {
     jUnitJupiterVersion = '5.8.2'
 }
 
-compileJava {
-    options.release = 17
-}
-
 application {
     mainClass = 'hexlet.code.App'
 }
