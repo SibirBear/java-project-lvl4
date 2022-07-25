@@ -8,7 +8,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
 
-public class Url extends Model {
+public final class Url extends Model {
 
     @Id
     private final long id;
@@ -19,11 +19,11 @@ public class Url extends Model {
     @Temporal(TemporalType.TIMESTAMP)
     private final Date createAt;
 
-    public Url(String db, long id, String name, Date createAt) {
+    public Url(String db, long pId, String pName, Date pCreateAt) {
         super(db);
-        this.id = id;
-        this.name = name;
-        this.createAt = createAt;
+        this.id = pId;
+        this.name = pName;
+        this.createAt = pCreateAt;
     }
 
     public long getId() {
