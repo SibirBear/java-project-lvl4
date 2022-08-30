@@ -9,6 +9,7 @@
 plugins {
     id 'application'
     id 'checkstyle'
+    id 'jacoco'
 }
 
 group = 'hexlet.code'
@@ -20,6 +21,21 @@ repositories {
 
 application {
     mainClass = 'hexlet.code.App'
+}
+
+dependencies {
+    implementation 'io.javalin:javalin:4.0.1'
+    implementation 'org.slf4j:slf4j-simple:1.7.31'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+    }
 }
 
 checkstyle {
