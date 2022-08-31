@@ -26,6 +26,10 @@ application {
 dependencies {
     implementation 'io.javalin:javalin:4.0.1'
     implementation 'org.slf4j:slf4j-simple:1.7.31'
+
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
+    testImplementation 'org.assertj:assertj-core:3.22.0'
 }
 
 test {
