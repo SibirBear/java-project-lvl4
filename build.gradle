@@ -45,3 +45,6 @@ jacocoTestReport {
 checkstyle {
     toolVersion '10.0'
 }
+
+task stage(dependsOn: ['clean', 'installDist'])
+installDist.mustRunAfter clean
