@@ -8,3 +8,7 @@ datasource:
     username: ${JDBC_DATABASE_USERNAME}
     password: ${JDBC_DATABASE_PASSWORD}
     url: ${JDBC_DATABASE_URL}
+
+ebean:
+  migration:
+    run: true

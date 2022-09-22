@@ -9,6 +9,7 @@
 plugins {
     id 'application'
     id 'checkstyle'
+    id 'io.ebean' version '12.11.5'
     id 'jacoco'
 }
 
@@ -59,6 +60,11 @@ jacocoTestReport {
 
 checkstyle {
     toolVersion '10.0'
+}
+
+task generateMigrations(type:JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'hexlet.code.MigrationGenerator'
 }
 
 task stage(dependsOn: ['clean', 'installDist'])
