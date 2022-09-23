@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    lang="ru">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SEO Page Analyser</title>
+    <link rel='stylesheet'
+          href='/webjars/bootstrap/5.1.3/css/bootstrap.min.css'>
+    <script src="/webjars/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">Анализатор страниц</a>
+        <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+                aria-controls="navbarNav"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="navbar-nav">
+                <a class="nav-link" href="/">Главная</a>
+                <a class="nav-link" href="/">Сайты</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<main class="flex-grow-1">
+    <div
+            th:if="${session.flash}"
+            class="alert alert-info"
+            role="alert"
+            th:text="${session.flash}"
+    ></div>
+    <div
+            th:if="${session.flash}"
+            th:text="${#session.removeAttribute('flash')}"
+    ></div>
+    <section layout:fragment="content"></section>
+</main>
+
+<footer class="footer border-top py-3 mt-5 bg-light">
+    <div class="container-xl">
+        <div class="text-center">
+            created by
+            <a href="https://github.com/SibirBear" target="_blank">Igor Cherkasov</a>
+            for 4th study project on
+            <a href="https://hexlet.io" target="_blank">Hexlet</a>
+        </div>
+    </div>
+</footer>
+</body>
+
+</html>
