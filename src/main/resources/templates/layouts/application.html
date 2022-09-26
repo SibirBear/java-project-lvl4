@@ -29,7 +29,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <div class="navbar-nav">
                 <a class="nav-link" href="/">Главная</a>
-                <a class="nav-link" href="/">Сайты</a>
+                <a class="nav-link" href="/urls">Сайты</a>
             </div>
         </div>
     </div>
@@ -38,14 +38,12 @@
 <main class="flex-grow-1">
     <div
             th:if="${session.flash}"
-            class="alert alert-info"
+            th:class="'rounded-0 m-0 alert alert-dismissible fade show alert-' + ${ctx.consumeSessionAttribute('flash-type')}"
             role="alert"
-            th:text="${session.flash}"
-    ></div>
-    <div
-            th:if="${session.flash}"
-            th:text="${#session.removeAttribute('flash')}"
-    ></div>
+    >
+        <p class="m-0" th:text="${ctx.consumeSessionAttribute('flash')}"></p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     <section layout:fragment="content"></section>
 </main>
 
@@ -54,7 +52,7 @@
         <div class="text-center">
             created by
             <a href="https://github.com/SibirBear" target="_blank">Igor Cherkasov</a>
-            for 4th study project on
+            for 4th educational project on
             <a href="https://hexlet.io" target="_blank">Hexlet</a>
         </div>
     </div>
