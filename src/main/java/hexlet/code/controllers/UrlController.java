@@ -12,8 +12,10 @@ import java.util.Objects;
 
 public class UrlController {
 
+    private static final int MAX_ROWS = 10;
+
     public static Handler listUrls = ctx -> {
-        List<Url> urlsList = new QUrl().setMaxRows(10).findList();
+        List<Url> urlsList = new QUrl().setMaxRows(MAX_ROWS).findList();
         ctx.attribute("urls", urlsList);
         ctx.render("urls/index.html");
     };
@@ -37,15 +39,14 @@ public class UrlController {
 
         try {
             String normalizedUrl = getNormalizedUrl(url);
+            ctx.sessionAttribute("flash-type", "success");
+
             if (!isNotDublicateUrl(normalizedUrl)) {
-                ctx.status(422);
-                ctx.sessionAttribute("flash-type", "success");
                 ctx.sessionAttribute("flash", "Страница уже существует");
                 ctx.redirect("urls");
             } else {
                 Url newUrl = new Url(normalizedUrl);
                 newUrl.save();
-                ctx.sessionAttribute("flash-type", "success");
                 ctx.sessionAttribute("flash", "Страница успешно добавлена");
                 ctx.redirect("urls");
             }
