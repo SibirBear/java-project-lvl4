@@ -27,13 +27,15 @@ class AppTest {
     private static final String LOCALHOST = "http://localhost:";
     private static final int HTTP_STATUS_OK = 200;
     private static final int HTTP_STATUS_FOUND = 302;
+    private static final int HTTP_STATUS_NOTFOUND = 404;
+    private static final int HTTP_STATUS_UNPROCESS = 422;
 
     //To fill in the test database
     private static final String TEST_NAME_URL_1 = "https://hexlet.io";
     private static final String TEST_DATE_URL_1 = "2022-09-26 14:00:00";
     private static final String TEST_NAME_URL_2 = "https://cv.hexlet.io";
     private static final String TEST_DATE_URL_2 = "2022-09-26 14:10:00";
-    private static final String NEW_URL_TO_ADD = "https://test.com";
+    private static final String NEW_URL_TO_ADD = "https://test.com:8080";
 
     @BeforeAll
     public static void beforeAll() {
@@ -89,7 +91,7 @@ class AppTest {
         }
 
         @Test
-        void testShowUrl() {
+        void testShowUrlCorrect() {
             HttpResponse<String> response = Unirest
                     .get(urlApp + "/urls/2")
                     .asString();
@@ -102,8 +104,17 @@ class AppTest {
         }
 
         @Test
-        void testNewUrl() {
+        void testShowUrlNone() {
+            HttpResponse<String> response = Unirest
+                    .get(urlApp + "/urls/1000")
+                    .asString();
 
+            assertThat(response.getStatus()).isEqualTo(HTTP_STATUS_NOTFOUND);
+
+        }
+
+        @Test
+        void testNewUrlCorrect() {
             HttpResponse responsePost = Unirest
                     .post(urlApp + "/urls")
                     .field("url", NEW_URL_TO_ADD)
@@ -127,6 +138,37 @@ class AppTest {
             assertThat(actualUrl.getName()).isEqualTo(NEW_URL_TO_ADD);
 
         }
+
+        @Test
+        void testNewUrlUnCorrect() {
+            HttpResponse<String> responsePost = Unirest
+                    .post(urlApp + "/urls")
+                    .field("url", "test.com")
+                    .asString();
+
+            assertThat(responsePost.getStatus()).isEqualTo(HTTP_STATUS_UNPROCESS);
+            assertThat(responsePost.getHeaders().getFirst("Location")).isEqualTo("");
+            assertThat(responsePost.getBody()).contains("Некорректный URL");
+
+        }
+
+        @Test
+        void testNewUrlDublicate() {
+            HttpResponse responsePost = Unirest
+                    .post(urlApp + "/urls")
+                    .field("url", TEST_NAME_URL_1)
+                    .asString();
+
+            assertThat(responsePost.getStatus()).isEqualTo(HTTP_STATUS_FOUND);
+
+            HttpResponse<String> response = Unirest
+                    .get(urlApp + "/urls").asString();
+
+            assertThat(response.getStatus()).isEqualTo(HTTP_STATUS_OK);
+            assertThat(response.getBody()).contains("Страница уже существует");
+
+        }
+
     }
 
 }
