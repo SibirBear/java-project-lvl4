@@ -1,0 +1,5 @@
+ebean:
+  test:
+    useDocker: false
+    platform: h2
+    dbName: test
