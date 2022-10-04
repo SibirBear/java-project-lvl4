@@ -1,38 +1,29 @@
 package hexlet.code.model;
 
 import io.ebean.Model;
-import io.ebean.annotation.NotNull;
 import io.ebean.annotation.WhenCreated;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.time.Instant;
+import java.util.List;
 
+@RequiredArgsConstructor
+@Getter
 @Entity
 public final class Url extends Model {
 
     @Id
     private long id;
-    private String name;
-
-    @NotNull
+    @NonNull
+    private final String name;
     @WhenCreated
     private Instant createdAt;
-
-    public Url(String pName) {
-        this.name = pName;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
+    @OneToMany
+    private List<UrlCheck> urlChecks;
 
 }
