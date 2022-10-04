@@ -19,12 +19,14 @@
             <th>Код ответа</th>
             </thead>
             <tbody>
-            <tr th:each="url : ${urls}" th:object="${url}">
+            <tr th:each="url : ${urls}" th:object="${url}"
+                th:with="urlCheck=${urlCheckList.get(url.getId())}">
                 <td th:text="*{id}"></td>
                 <td>
                     <a th:text="*{name}" th:href="@{/urls/{id}(id=*{id})}"></a>
                 </td>
-                <td th:text="${#temporals.format(url.getCreatedAt(), 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${urlCheck ? #temporals.format(urlCheck.getCreatedAt(), 'dd/MM/yyyy HH:mm') : ''}"></td>
+                <td th:text="${urlCheck ? urlCheck.getStatusCode() : ''}"></td>
             </tr>
             </tbody>
         </table>

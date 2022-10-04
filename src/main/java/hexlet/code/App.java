@@ -53,11 +53,18 @@ public class App {
 
     private static void addRoutes(Javalin app) {
         app.get("/", RootController.root);
-        app.routes(() -> path("/", () -> {
-            post("urls", UrlController.newUrl);
-            get("urls", UrlController.listUrls);
-            get("urls/{id}", UrlController.showUrl);
-        }));
+        app.routes(() -> {
+            path("urls", () -> {
+                post(UrlController.newUrl);
+                get(UrlController.listUrls);
+                path("{id}", () -> {
+                    get(UrlController.showUrl);
+                    path("checks", () -> {
+                        post(UrlController.checkUrl);
+                    });
+                });
+            });
+        });
     }
 
     private static TemplateEngine getTemplateEngine() {

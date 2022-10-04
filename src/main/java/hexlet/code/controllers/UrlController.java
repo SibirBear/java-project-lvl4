@@ -1,13 +1,19 @@
 package hexlet.code.controllers;
 
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
 import hexlet.code.model.query.QUrl;
+import hexlet.code.model.query.QUrlCheck;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class UrlController {
@@ -16,12 +22,17 @@ public class UrlController {
 
     public static Handler listUrls = ctx -> {
         List<Url> urlsList = new QUrl().setMaxRows(MAX_ROWS).findList();
+
+        Map<Integer, UrlCheck> urlCheckList = new QUrlCheck()
+                .url.id.asMapKey().orderBy().id.asc().findMap();
+
         ctx.attribute("urls", urlsList);
+        ctx.attribute("urlCheckList", urlCheckList);
         ctx.render("urls/index.html");
     };
 
     public static Handler showUrl = ctx -> {
-        int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
+        long id = ctx.pathParamAsClass("id", Long.class).getOrDefault(null);
 
         Url url = new QUrl().id.equalTo(id).findOne();
 
@@ -56,6 +67,38 @@ public class UrlController {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.render("index.html");
         }
+
+    };
+
+    public static Handler checkUrl = ctx -> {
+        long id = ctx.pathParamAsClass("id", Long.class).getOrDefault(null);
+
+        Url url = new QUrl().id.equalTo(id).findOne();
+
+        if (url == null) {
+            throw new NotFoundResponse();
+        }
+
+        HttpResponse<String> response;
+
+        try {
+            response = Unirest.get(url.getName()).asString();
+
+        } catch (UnirestException e) {
+            ctx.sessionAttribute("flash-type", "danger");
+            ctx.sessionAttribute("flash", "Страница не существует");
+            ctx.redirect("/urls/" + id);
+            return;
+        }
+
+        UrlCheck urlCheck = new UrlCheck();
+        urlCheck.setStatusCode(response.getStatus());
+        urlCheck.setUrl(url);
+        urlCheck.save();
+
+        ctx.sessionAttribute("flash-type", "success");
+        ctx.sessionAttribute("flash", "Страница успешно проверена");
+        ctx.redirect("/urls/" + id);
 
     };
 
