@@ -7,12 +7,16 @@ import io.ebean.Database;
 import io.javalin.Javalin;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,6 +27,7 @@ class AppTest {
     private static Javalin testApp;
     private static String urlApp;
     private static Database database;
+    private static MockWebServer mockWebServer;
 
     private static final String LOCALHOST = "http://localhost:";
     private static final int HTTP_STATUS_OK = 200;
@@ -53,11 +58,19 @@ class AppTest {
 
     @BeforeEach
     void beforeEach() {
-        database.script().runScript("truncate", "TRUNCATE TABLE url RESTART IDENTITY", false);
+        //database.script().runScript("truncate", "TRUNCATE TABLE url RESTART IDENTITY", false);
+
         database.script().runScript("create", "INSERT INTO url (name, created_at) VALUES ('"
                 + TEST_NAME_URL_1 + "', '" + TEST_DATE_URL_1 + "'), ('"
                 + TEST_NAME_URL_2 + "', '" + TEST_DATE_URL_2 + "');",
                 false);
+    }
+
+    @AfterEach
+    void afterEach() {
+        database.script().runScript("truncate1", "SET REFERENTIAL_INTEGRITY FALSE", false);
+        database.script().runScript("truncate2", "TRUNCATE TABLE url RESTART IDENTITY", false);
+        database.script().runScript("truncate3", "SET REFERENTIAL_INTEGRITY TRUE", false);
     }
 
     @Test
@@ -167,6 +180,30 @@ class AppTest {
             assertThat(response.getStatus()).isEqualTo(HTTP_STATUS_OK);
             assertThat(response.getBody()).contains("Страница уже существует");
 
+        }
+
+        @Test
+        void testUrlCheck() throws IOException {
+            mockWebServer = new MockWebServer();
+            mockWebServer.enqueue(new MockResponse().setBody("/preform/test.html"));
+            mockWebServer.start();
+
+            String urlOriginal = mockWebServer.url("").toString();
+            String urlFinal = urlOriginal.substring(0, urlOriginal.length() - 1);
+
+            HttpResponse postNewUrl = Unirest.post(urlApp + "/urls").field("url", urlOriginal).asEmpty();
+
+            Url url = new QUrl().name.equalTo(urlFinal).findOne();
+
+            HttpResponse<String> postCheck = Unirest.post(urlApp + "/urls/" + url.getId() + "/checks").asString();
+            HttpResponse<String> resp = Unirest.get(urlApp + "/urls/" + url.getId()).asString();
+
+            String body = resp.getBody();
+
+            assertThat(resp.getStatus()).isEqualTo(HTTP_STATUS_OK);
+            assertThat(body).contains("Страница успешно проверена");
+
+            mockWebServer.shutdown();
         }
 
     }

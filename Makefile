@@ -7,6 +7,9 @@ build:
 install:
 	./gradlew install
 
+start:
+    APP_ENV=development ./gradlew run
+
 lint:
 	./gradlew checkstyleMain checkstyleTest
 
