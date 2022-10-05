@@ -1,6 +1,7 @@
 package hexlet.code;
 
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
 import hexlet.code.model.query.QUrl;
 import io.ebean.DB;
 import io.ebean.Database;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -183,7 +185,25 @@ class AppTest {
         }
 
         @Test
-        void testUrlCheck() throws IOException {
+        void testUrlCheckModel() {
+            UrlCheck urlCheck = new UrlCheck();
+            Url url = new QUrl().id.equalTo(1).findOne();
+            urlCheck.setUrl(url);
+            urlCheck.setTitle("Title");
+            urlCheck.setDescription("Description");
+            urlCheck.setH1("H1");
+            urlCheck.setStatusCode(200);
+
+            assertThat(urlCheck.getTitle()).isEqualTo("Title");
+            assertThat(urlCheck.getDescription()).isEqualTo("Description");
+            assertThat(urlCheck.getH1()).isEqualTo("H1");
+            assertThat(urlCheck.getStatusCode()).isEqualTo(200);
+            assertThat(urlCheck.getUrl().getName()).isEqualTo(TEST_NAME_URL_1);
+
+        }
+
+        @Test
+        void testUrlCheckWeb() throws IOException {
             mockWebServer = new MockWebServer();
             mockWebServer.enqueue(new MockResponse().setBody("/preform/test.html"));
             mockWebServer.start();
