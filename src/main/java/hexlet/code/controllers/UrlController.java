@@ -71,12 +71,12 @@ public class UrlController {
 
             if (!isNotDublicateUrl(normalizedUrl)) {
                 ctx.sessionAttribute("flash", "Страница уже существует");
-                ctx.redirect("urls");
+                ctx.redirect("/urls");
             } else {
                 Url newUrl = new Url(normalizedUrl);
                 newUrl.save();
                 ctx.sessionAttribute("flash", "Страница успешно добавлена");
-                ctx.redirect("urls");
+                ctx.redirect("/urls");
             }
         } catch (MalformedURLException e) {
             ctx.status(422);

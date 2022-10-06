@@ -139,7 +139,7 @@ class AppTest {
                     .asString();
 
             assertThat(responsePost.getStatus()).isEqualTo(HTTP_STATUS_FOUND);
-            assertThat(responsePost.getHeaders().getFirst("Location")).isEqualTo("urls");
+            assertThat(responsePost.getHeaders().getFirst("Location")).isEqualTo("/urls");
 
             HttpResponse<String> response = Unirest
                     .get(urlApp + "/urls").asString();
