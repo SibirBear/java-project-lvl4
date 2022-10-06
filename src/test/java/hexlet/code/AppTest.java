@@ -3,6 +3,7 @@ package hexlet.code;
 import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 import hexlet.code.model.query.QUrl;
+import hexlet.code.model.query.QUrlCheck;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.javalin.Javalin;
@@ -18,6 +19,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,6 +45,7 @@ class AppTest {
     private static final String TEST_NAME_URL_2 = "https://cv.hexlet.io";
     private static final String TEST_DATE_URL_2 = "2022-09-26 14:10:00";
     private static final String NEW_URL_TO_ADD = "https://test.com:8080";
+    private static final String PATH_TO_TEST_FILE = "src/test/resources/preform/test.html";
 
     @BeforeAll
     public static void beforeAll() {
@@ -204,25 +208,48 @@ class AppTest {
         @Test
         void testUrlCheckWeb() throws IOException {
             mockWebServer = new MockWebServer();
-            mockWebServer.enqueue(new MockResponse().setBody("/preform/test.html"));
+            mockWebServer.enqueue(new MockResponse().setBody(getContentFromFile()));
             mockWebServer.start();
 
             String urlOriginal = mockWebServer.url("").toString();
             String urlFinal = urlOriginal.substring(0, urlOriginal.length() - 1);
 
-            HttpResponse postNewUrl = Unirest.post(urlApp + "/urls").field("url", urlOriginal).asEmpty();
+            HttpResponse postNewUrl = Unirest.post(urlApp + "/urls")
+                    .field("url", urlOriginal).asEmpty();
 
             Url url = new QUrl().name.equalTo(urlFinal).findOne();
 
-            HttpResponse<String> postCheck = Unirest.post(urlApp + "/urls/" + url.getId() + "/checks").asString();
-            HttpResponse<String> resp = Unirest.get(urlApp + "/urls/" + url.getId()).asString();
+            HttpResponse<String> postCheck = Unirest
+                    .post(urlApp + "/urls/" + url.getId() + "/checks").asString();
+
+            UrlCheck urlCheck = new QUrlCheck().url.equalTo(url).findOne();
+
+
+            HttpResponse<String> resp = Unirest
+                    .get(urlApp + "/urls/" + url.getId()).asString();
 
             String body = resp.getBody();
 
             assertThat(resp.getStatus()).isEqualTo(HTTP_STATUS_OK);
             assertThat(body).contains("Страница успешно проверена");
+            assertThat(body).contains("Description_for_test_title");
+            assertThat(body).contains("Title_test_one");
+            assertThat(body).contains("Test page");
 
             mockWebServer.shutdown();
+        }
+
+        @Test
+        void testUrlCheckException() {
+            HttpResponse resp = Unirest.post(urlApp + "/urls/1111/checks").asString();
+            assertThat(resp.getStatus()).isEqualTo(HTTP_STATUS_NOTFOUND);
+
+        }
+
+        private static String getContentFromFile() throws IOException {
+            Path path = Path.of(AppTest.PATH_TO_TEST_FILE).normalize();
+            return Files.readString(path);
+
         }
 
     }
