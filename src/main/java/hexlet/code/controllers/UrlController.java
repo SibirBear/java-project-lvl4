@@ -9,6 +9,9 @@ import io.javalin.http.NotFoundResponse;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -21,20 +24,34 @@ public class UrlController {
     private static final int MAX_ROWS = 10;
 
     public static Handler listUrls = ctx -> {
-        List<Url> urlsList = new QUrl().setMaxRows(MAX_ROWS).findList();
+        int page = ctx.queryParamAsClass("page", Integer.class)
+                .getOrDefault(1);
+
+        List<Url> urlsList = new QUrl()
+                .setFirstRow(MAX_ROWS * (page - 1))
+                .setMaxRows(MAX_ROWS)
+                .orderBy().id.asc()
+                .findList();
 
         Map<Integer, UrlCheck> urlCheckList = new QUrlCheck()
-                .url.id.asMapKey().orderBy().id.asc().findMap();
+                .url.id.asMapKey()
+                .orderBy().createdAt.desc()
+                .findMap();
+
+        List<Url> list = new QUrl().findList();
+        int pages = (int) Math.ceil(list.size() / MAX_ROWS);
 
         ctx.attribute("urls", urlsList);
         ctx.attribute("urlCheckList", urlCheckList);
+        ctx.attribute("page", page);
+        ctx.attribute("pages", pages);
         ctx.render("urls/index.html");
     };
 
     public static Handler showUrl = ctx -> {
         long id = ctx.pathParamAsClass("id", Long.class).getOrDefault(null);
 
-        Url url = new QUrl().id.equalTo(id).findOne();
+        Url url = new QUrl().id.equalTo(id).urlChecks.fetch().orderBy().urlChecks.createdAt.desc().findOne();
 
         if (url == null) {
             throw new NotFoundResponse();
@@ -91,8 +108,17 @@ public class UrlController {
             return;
         }
 
+        String urlBody = response.getBody();
+        Document document = Jsoup.parse(urlBody);
+        String title = document.title();
+        Element h1 = document.selectFirst("h1");
+        Element description = document.selectFirst("meta[name=description]");
+
         UrlCheck urlCheck = new UrlCheck();
         urlCheck.setStatusCode(response.getStatus());
+        urlCheck.setTitle(title);
+        urlCheck.setH1(h1 == null ? "" : h1.text());
+        urlCheck.setDescription(description == null ? "" : description.attr("content"));
         urlCheck.setUrl(url);
         urlCheck.save();
 
