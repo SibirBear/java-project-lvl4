@@ -39,7 +39,7 @@ public class UrlController {
                 .findMap();
 
         List<Url> list = new QUrl().findList();
-        int pages = (int) Math.ceil(list.size() / MAX_ROWS);
+        int pages = (int) Math.ceil(list.size() / (double) MAX_ROWS);
 
         ctx.attribute("urls", urlsList);
         ctx.attribute("urlCheckList", urlCheckList);
