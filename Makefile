@@ -1,25 +1,25 @@
 clean:
-	/app/gradlew clean
+	./gradlew clean
 
 build:
-	/app/gradlew clean build
+	./gradlew clean build
 
 install:
-	/app/gradlew install
+	./gradlew install
 
 start:
-    APP_ENV=development /app/gradlew run
+    APP_ENV=development ./gradlew run
 
 lint:
-	/app/gradlew checkstyleMain checkstyleTest
+	./gradlew checkstyleMain checkstyleTest
 
 test:
-	/app/gradlew test
+	./gradlew test
 
 report:
-	/app/gradlew jacocoTestReport
+	./gradlew jacocoTestReport
 
 check-updates:
-	/app/gradlew dependencyUpdates
+	./gradlew dependencyUpdates
 
 .PHONY: build
