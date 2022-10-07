@@ -11,6 +11,8 @@ plugins {
     id 'checkstyle'
     id 'io.ebean' version '12.11.5'
     id 'jacoco'
+    id 'java'
+    id 'idea'
 }
 
 group = 'hexlet.code'
@@ -63,6 +65,10 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 
+}
+
+compileJava {
+    options.release = 17
 }
 
 test {
