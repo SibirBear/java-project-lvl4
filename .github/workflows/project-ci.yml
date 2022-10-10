@@ -15,12 +15,12 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Change wrapper permissions
-        run: chmod +x ./gradlew
       - name: Build with Gradle
-        run: make build
-      - name: Install with Gradle
-        run: make install
+        run: gradle/gradle-build-action@v2
+        with:
+          gradle-version: wrapper
+          arguments: build
+          build-root-directory: app
       - name: Publish code coverage
         uses: paambaati/codeclimate-action@v3.0.0
         env:
